@@ -1,0 +1,45 @@
+{
+  "name": "galaxy-job-tracking",
+  "version": "1.0.0",
+  "description": "Galaxy job error tracking system for monitoring and analyzing job failures over time",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "npm run build && node dist/index.js start",
+    "dev": "ts-node src/index.ts",
+    "watch": "ts-node --watch src/index.ts",
+    "lint": "eslint src/**/*.ts",
+    "format": "prettier --write src/**/*.ts",
+    "db:push": "npx prisma db push",
+    "db:migrate": "npx prisma migrate dev",
+    "db:generate": "npx prisma generate"
+  },
+  "keywords": [
+    "galaxy",
+    "bioinformatics",
+    "job-tracking",
+    "error-monitoring"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "dotenv": "^16.3.1",
+    "node-cron": "^3.0.3",
+    "openapi-fetch": "^0.14.0",
+    "openapi-typescript": "^7.8.0",
+    "pg": "^8.11.0",
+    "prisma": "^5.22.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/node-cron": "^3.0.11",
+    "@types/pg": "^8.10.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.0",
+    "@typescript-eslint/parser": "^6.13.0",
+    "eslint": "^8.54.0",
+    "prettier": "^3.1.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.3.0"
+  }
+}

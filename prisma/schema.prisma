@@ -1,0 +1,102 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Job {
+  id               String            @id
+  toolId           String            @map("tool_id")
+  state            String
+  createdTime      DateTime          @map("created_time")
+  updatedTime      DateTime          @map("updated_time")
+  handler          String?
+  destination      String?
+  historyId        String?           @map("history_id")
+  userId           String?           @map("user_id")
+  commandLine      String?           @map("command_line")
+  exitCode         Int?              @map("exit_code")
+  traceback        String?
+  
+  // Relations
+  jobErrors        JobError[]
+  jobMetrics       JobMetric[]
+  
+  @@map("jobs")
+  @@index([toolId])
+  @@index([state])
+  @@index([createdTime])
+  @@index([handler])
+  @@index([destination])
+}
+
+model JobError {
+  id            Int      @id @default(autoincrement())
+  jobId         String   @map("job_id")
+  stderr        String?
+  stdout        String?
+  errorType     String?  @map("error_type")
+  errorMessage  String?  @map("error_message")
+  createdAt     DateTime @default(now()) @map("created_at")
+  
+  // Relations
+  job           Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  
+  @@map("job_errors")
+  @@index([jobId])
+  @@index([errorType])
+}
+
+model JobMetric {
+  id          Int      @id @default(autoincrement())
+  jobId       String   @map("job_id")
+  metricType  String   @map("metric_type")
+  metricName  String   @map("metric_name")
+  metricValue String   @map("metric_value")
+  metricUnit  String?  @map("metric_unit")
+  createdAt   DateTime @default(now()) @map("created_at")
+  
+  // Relations
+  job         Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  
+  @@map("job_metrics")
+  @@index([jobId])
+  @@index([metricType])
+  @@index([metricName])
+}
+
+model JobAggregate {
+  id           Int      @id @default(autoincrement())
+  timeWindow   DateTime @map("time_window")
+  toolId       String   @map("tool_id")
+  handler      String?
+  destination  String?
+  successCount Int      @map("success_count")
+  errorCount   Int      @map("error_count")
+  totalCount   Int      @map("total_count")
+  errorRate    Float    @map("error_rate")
+  createdAt    DateTime @default(now()) @map("created_at")
+  
+  @@map("job_aggregates")
+  @@unique([timeWindow, toolId, handler, destination], name: "unique_aggregate")
+  @@index([timeWindow])
+  @@index([toolId])
+  @@index([errorRate])
+}
+
+model ProcessingStatus {
+  id               Int      @id @default(autoincrement())
+  lastProcessedTime DateTime @map("last_processed_time")
+  processingType    String   @map("processing_type")
+  status           String   @default("active")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+  
+  @@map("processing_status")
+  @@unique([processingType])
+}
